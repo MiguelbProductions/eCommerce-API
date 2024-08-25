@@ -9,3 +9,9 @@ services:
     volumes:
       - .:/app
     command: npm start
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/db:/data/db

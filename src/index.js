@@ -1,12 +1,14 @@
 const express = require('express');
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./config/swagger.js');
+const connectDB = require('./config/database');
+const productRoutes = require('./routes/productRoutes');
+
+connectDB();
 
 const app = express();
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(express.json());
 
-app.use('/products', require('./routes/products'));
+app.use('/products', productRoutes);
 
-const PORT = process.env.PORT || 1616;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
