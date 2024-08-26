@@ -2,7 +2,10 @@ const Product = require('../models/productModel');
 
 const addProduct = async (req, res) => {
     try {
-        const product = new Product(req.body);
+        const product = new Product({
+            ...req.body,
+            owner: req.user._id,
+        });
         await product.save();
         res.status(201).json(product);
     } catch (error) {
@@ -33,13 +36,21 @@ const getProductById = async (req, res) => {
 
 const updateProduct = async (req, res) => {
     try {
-        const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-        });
+        const product = await Product.findById(req.params.id);
+
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
-        res.status(200).json(product);
+
+        if (product.owner.toString() !== req.user._id.toString() && !req.user.isAdmin) {
+            return res.status(401).json({ message: 'Not authorized to update this product' });
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+        });
+
+        res.status(200).json(updatedProduct);
     } catch (error) {
         res.status(500).json({ message: 'Error updating product', error });
     }
@@ -47,15 +58,23 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
     try {
-        const product = await Product.findByIdAndDelete(req.params.id);
+        const product = await Product.findById(req.params.id);
+
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
+
+        if (product.owner.toString() !== req.user._id.toString() && !req.user.isAdmin) {
+            return res.status(401).json({ message: 'Not authorized to delete this product' });
+        }
+
+        await product.remove();
         res.status(200).json({ message: 'Product deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting product', error });
     }
 };
+
 
 const addReview = async (req, res) => {
     try {
