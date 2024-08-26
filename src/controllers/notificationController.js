@@ -1,10 +1,11 @@
 const Notification = require('../models/notificationModel');
 
-const createNotification = async (userId, message) => {
+const createNotification = async (userId, message, category = 'General') => {
     try {
         const notification = new Notification({
             user: userId,
             message,
+            category,
         });
         await notification.save();
     } catch (error) {

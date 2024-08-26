@@ -1,31 +1,28 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Cart = require('../models/cartModel');
-const Order = require('../models/orderModel'); // Assumindo que você vai criar um modelo de pedido
+const Order = require('../models/orderModel');
 const Product = require('../models/productModel');
+const { createNotification } = require('../controllers/notificationController');
 
 const processPayment = async (req, res) => {
   try {
     const { paymentMethodId, currency = 'usd' } = req.body;
 
-    // Encontrar o carrinho do usuário
     const cart = await Cart.findOne({ user: req.user._id }).populate('items.product');
     if (!cart) {
       return res.status(404).json({ message: 'Cart not found' });
     }
 
-    // Calcular o valor total
     const amount = cart.items.reduce((total, item) => total + item.product.price * item.quantity, 0);
 
-    // Crie o pagamento no Stripe com return_url
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // O valor é em centavos
+      amount: Math.round(amount * 100),
       currency,
       payment_method: paymentMethodId,
       confirm: true,
-      return_url: 'https://your-website.com/return-url', // Substitua pelo URL apropriado
+      return_url: 'https://your-website.com/return-url',
     });
 
-    // Criar um pedido no banco de dados
     const order = new Order({
       user: req.user._id,
       items: cart.items,
@@ -34,22 +31,20 @@ const processPayment = async (req, res) => {
       status: 'paid',
     });
 
-    // Reduzir o estoque dos produtos comprados
     for (const item of cart.items) {
       const product = await Product.findById(item.product._id);
       product.stock -= item.quantity;
       await product.save();
     }
 
-    // Salvar o pedido
     await order.save();
 
-    // Limpar o carrinho
+    await createNotification(req.user._id, `Your order #${order._id} has been successfully placed.`, 'Order Update');
+
     cart.items = [];
     cart.totalPrice = 0;
     await cart.save();
 
-    // Enviar a resposta de sucesso
     res.status(200).json({
       message: 'Payment successful',
       order,

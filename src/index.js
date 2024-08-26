@@ -6,6 +6,7 @@ const cartRoutes = require('./routes/cartRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -21,6 +22,7 @@ app.use('/cart', cartRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/orders', orderRoutes);
 app.use('/wishlist', wishlistRoutes);
+app.use('/notifications', notificationRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

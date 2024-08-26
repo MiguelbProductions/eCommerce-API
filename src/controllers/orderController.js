@@ -1,4 +1,5 @@
 const Order = require('../models/orderModel');
+const { createNotification } = require('../controllers/notificationController');
 
 const getMyOrders = async (req, res) => {
     try {
@@ -40,6 +41,9 @@ const updateOrderStatus = async (req, res) => {
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
+
+        const message = `Your order #${order._id} status has been updated to ${status}.`;
+        await createNotification(order.user, message, 'Order Update');
 
         res.status(200).json(order);
     } catch (error) {

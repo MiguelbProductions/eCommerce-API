@@ -10,6 +10,11 @@ const notificationSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    category: {
+        type: String,
+        enum: ['Order Update', 'Promotion', 'New Product', 'General'],
+        default: 'General',
+    },
     isRead: {
         type: Boolean,
         default: false,
