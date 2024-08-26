@@ -1,6 +1,5 @@
 const Product = require('../models/productModel');
 
-// Adicionar Produto
 const addProduct = async (req, res) => {
     try {
         const product = new Product(req.body);
@@ -11,7 +10,6 @@ const addProduct = async (req, res) => {
     }
 };
 
-// Obter Todos os Produtos
 const getProducts = async (req, res) => {
     try {
         const products = await Product.find();
@@ -21,7 +19,6 @@ const getProducts = async (req, res) => {
     }
 };
 
-// Obter Produto por ID
 const getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
@@ -34,7 +31,6 @@ const getProductById = async (req, res) => {
     }
 };
 
-// Atualizar Produto
 const updateProduct = async (req, res) => {
     try {
         const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
@@ -49,7 +45,6 @@ const updateProduct = async (req, res) => {
     }
 };
 
-// Deletar Produto
 const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.id);
@@ -62,19 +57,33 @@ const deleteProduct = async (req, res) => {
     }
 };
 
-// Adicionar Avaliação ao Produto
 const addReview = async (req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ message: 'User not authenticated' });
+        }
+
         const product = await Product.findById(req.params.id);
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
+
+        const alreadyReviewed = product.reviews.find(
+            (r) => r.user.toString() === req.user._id.toString()
+        );
+
+        if (alreadyReviewed) {
+            return res.status(400).json({ message: 'Product already reviewed' });
+        }
+
         const review = {
-            user: req.body.user,
+            user: req.user._id,
             rating: req.body.rating,
             comment: req.body.comment,
         };
+
         product.reviews.push(review);
+
         product.ratings =
             product.reviews.reduce((acc, item) => item.rating + acc, 0) /
             product.reviews.length;
@@ -82,7 +91,8 @@ const addReview = async (req, res) => {
         await product.save();
         res.status(201).json(product);
     } catch (error) {
-        res.status(500).json({ message: 'Error adding review', error });
+        console.error('Error adding review:', error); // Log de erro
+        res.status(500).json({ message: 'Error adding review', error: error.message });
     }
 };
 
