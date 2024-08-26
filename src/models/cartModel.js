@@ -21,12 +21,9 @@ const cartSchema = new mongoose.Schema({
             },
         },
     ],
-    totalPrice: {
-        type: Number,
-        required: true,
-        default: 0,
-    },
 });
+
+cartSchema.index({ user: 1 });
 
 const Cart = mongoose.model('Cart', cartSchema);
 
