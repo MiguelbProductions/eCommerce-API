@@ -115,6 +115,56 @@ const addReview = async (req, res) => {
     }
 };
 
+const searchProducts = async (req, res) => {
+    try {
+      const {
+        name,
+        category,
+        minPrice,
+        maxPrice,
+        rating,
+        brand,
+        inStock,
+      } = req.query;
+  
+      const query = {};
+  
+      if (name) {
+        query.name = { $regex: name, $options: 'i' };
+      }
+  
+      if (category) {
+        query.category = category;
+      }
+  
+      if (minPrice) {
+        query.price = { ...query.price, $gte: Number(minPrice) };
+      }
+  
+      if (maxPrice) {
+        query.price = { ...query.price, $lte: Number(maxPrice) };
+      }
+  
+      if (rating) {
+        query.ratings = { $gte: Number(rating) };
+      }
+  
+      if (brand) {
+        query.brand = brand;
+      }
+  
+      if (inStock) {
+        query.stock = { $gt: 0 };
+      }
+  
+      const products = await Product.find(query);
+      
+      res.status(200).json(products);
+    } catch (error) {
+      res.status(500).json({ message: 'Error searching products', error: error.message });
+    }
+  };
+
 module.exports = {
     addProduct,
     getProducts,
@@ -122,4 +172,5 @@ module.exports = {
     updateProduct,
     deleteProduct,
     addReview,
+    searchProducts
 };
