@@ -12,14 +12,14 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Users
- *   description: Rotas relacionadas aos usuários
+ *   description: User management routes
  */
 
 /**
  * @swagger
  * /users/register:
  *   post:
- *     summary: Registra um novo usuário
+ *     summary: Register a new user
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -43,9 +43,9 @@ const router = express.Router();
  *                 example: MySecurePassword123
  *     responses:
  *       201:
- *         description: Usuário registrado com sucesso
+ *         description: User successfully registered
  *       400:
- *         description: Dados inválidos
+ *         description: Invalid data
  */
 router.post('/register', registerUser);
 
@@ -53,7 +53,7 @@ router.post('/register', registerUser);
  * @swagger
  * /users/login:
  *   post:
- *     summary: Autentica um usuário
+ *     summary: Authenticate a user
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -73,9 +73,9 @@ router.post('/register', registerUser);
  *                 example: MySecurePassword123
  *     responses:
  *       200:
- *         description: Usuário autenticado com sucesso
+ *         description: User successfully authenticated
  *       401:
- *         description: Credenciais inválidas
+ *         description: Invalid credentials
  */
 router.post('/login', authUser);
 
@@ -83,17 +83,17 @@ router.post('/login', authUser);
  * @swagger
  * /users/profile:
  *   get:
- *     summary: Retorna o perfil do usuário autenticado
+ *     summary: Get the authenticated user's profile
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Dados do perfil do usuário
+ *         description: User profile data
  *       401:
- *         description: Não autorizado
+ *         description: Not authorized
  *   put:
- *     summary: Atualiza o perfil do usuário autenticado
+ *     summary: Update the authenticated user's profile
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -112,11 +112,11 @@ router.post('/login', authUser);
  *                 type: string
  *     responses:
  *       200:
- *         description: Perfil atualizado com sucesso
+ *         description: Profile successfully updated
  *       400:
- *         description: Dados inválidos
+ *         description: Invalid data
  *       401:
- *         description: Não autorizado
+ *         description: Not authorized
  */
 router
   .route('/profile')

@@ -11,12 +11,16 @@ const reportRoutes = require('./routes/reportRoutes');
 const couponRoutes = require('./routes/couponRoutes');
 const dotenv = require('dotenv');
 const swaggerDocs = require('./config/swagger'); 
+const path = require('path');
+
 dotenv.config();
 connectDB();
 
 const app = express();
 
 app.use(express.json());
+
+app.use('/public', express.static(path.join(__dirname, '../public')));
 
 app.use('/users', userRoutes);
 app.use('/products', productRoutes);
