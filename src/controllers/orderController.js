@@ -64,9 +64,24 @@ const getAllOrders = async (req, res) => {
     }
 };
 
+const getPurchaseHistory = async (req, res) => {
+    try {
+        const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
+
+        if (!orders.length) {
+            return res.status(404).json({ message: 'No purchase history found' });
+        }
+
+        res.status(200).json(orders);
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving purchase history', error: error.message });
+    }
+};
+
 module.exports = {
     getMyOrders,
     getOrderById,
     updateOrderStatus,
     getAllOrders,
+    getPurchaseHistory,
 };
