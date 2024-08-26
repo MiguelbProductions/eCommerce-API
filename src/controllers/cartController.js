@@ -63,7 +63,6 @@ const getCart = async (req, res) => {
     }
 };
 
-
 const updateCartItem = async (req, res) => {
     try {
         const { productId, quantity } = req.body;
@@ -103,7 +102,6 @@ const updateCartItem = async (req, res) => {
         res.status(500).json({ message: 'Error updating cart', error: error.message });
     }
 };
-
 
 const removeFromCart = async (req, res) => {
     try {
